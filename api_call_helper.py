@@ -1,8 +1,8 @@
 import requests
 import base64
 
-spotify_client_id = "5ecb385927d94694819928aa033f888c"
-spotify_client_secret = "7b5b6a9f89ea45fb9bd55773c6c838ba"
+spotify_client_id = ""
+spotify_client_secret = ""
 
 def establish_spotify_connection(client_id, client_secret):
     """Given a client ID, client secret and API URL, a connection request to Spotify
@@ -20,42 +20,29 @@ def establish_spotify_connection(client_id, client_secret):
     else:
         raise ConnectionRefusedError(f"data not received, received code {response.status_code} instead.")
     
-def spotify_search_track(search_query, access_token, type=0):
-    
+def spotify_search_track(search_query, access_token):
+    """Given a search query and a valid access token, returns the top 3 results,
+    and all related data, of that query from Spotify's servers."""
+
     query_split = list(search_query.split(" "))
     url = "https://api.spotify.com/v1/search?q="
-
-    prev_token = None
+    url += query_split[0]
     
-    for item in query_split:
-        if item.lower() in {"track:", "album:", "artist:", "year:", "genre:"}:
-            url += "%2520"+ item[:-1] + "%3A"
-            prev_token = "key"
-        
-        else:
-            if ":" in item:
-                print(item)
-                item = item.replace(":", "%3A")
-                url += item
-                prev_token = "value + semi"
-
-            else:
-                if prev_token in {"key","value + semi"}:
-                    url += item
-                else:
-                    url += "%2520" + item
-                prev_token = "value"
-    url += "&type=track"
+    for item in query_split[1:]:
+        url += "+" + item
+    
+    url += "&type=track&limit=3"
     headers = {"Authorization": "Bearer " + access_token}
     data = requests.get(url,headers=headers)
     data = data.json()
-    print(url)
-    print(data)
+    return data
+
+def extract_track_data(data):
+    tracks = data["tracks"]["items"]
+    print(tracks)
 
 
-        
-
-token_data = establish_spotify_connection(spotify_client_id, spotify_client_secret)
     
-spotify_search_track("track: Subboreal artist: The Ocean", token_data["access_token"])
-    
+
+extract_track_data(spotify_search_track("Subboreal The Ocean", 
+                   establish_spotify_connection(spotify_client_id,spotify_client_secret)["access_token"]))
