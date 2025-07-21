@@ -1,20 +1,23 @@
+import hashlib
+import string
 import requests
 import base64
 import secrets
 import urllib.parse
-from flask import Flask
+
+from flask import Flask,redirect
 
 app = Flask(__name__)
+spotify_client_id = "5ecb385927d94694819928aa033f888c"
+spotify_client_secret = "cdac46ae967e4609b3b30d5982f67a7e"
+redirect_uri = "http://127.0.0.1:8888/callback"
+auth_code = ""
 
-@app.route('/')
-def home():
-    return "Hello World"
-
-spotify_client_id = ""
-spotify_client_secret = ""
-redirect_uri = ""
 
 def get_spotify_data(url, access_token):
+    """given a Spotify URL and a valid access token, requests the data at the 
+    link. Throws ConnectionRefusedError if the incoming status code is anything
+    other than 200."""
 
     header = {"Authorization": "Bearer " + access_token}
     data = requests.get(url, headers=header)
@@ -41,16 +44,22 @@ def establish_spotify_connection(client_id, client_secret):
     else:
         ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")
 
-def spotify_login(client_id,redirect_uri):
+
+
+
+
+def spotify_login():
     scopes = "playlist-read-private playlist-modify-private playlist-modify-public"
-    state = secrets.token_urlsafe(16);
+    state = generate_random_string(64);
+    
     redirect_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
         "response_type": "code",
-        "client_id": client_id,
+        "client_id": spotify_client_id,
         "scope": scopes,
         "redirect_uri" :redirect_uri,
         "state":state
     })
+    return redirect(redirect_url)
     
     
 def spotify_search_track(search_query, access_token):
@@ -67,6 +76,7 @@ def spotify_search_track(search_query, access_token):
     url += "&type=track&limit=3"
     data = get_spotify_data(url, access_token)
     return data
+
 
 def extract_track_data(data):
     """given data about the recieved tracks, returns a list of lists with
@@ -86,19 +96,22 @@ def extract_track_data(data):
         tracklist[track].append({"album": current_track["album"]["name"]})
     return tracklist
 
+
 def spotify_get_user_playlists(access_token):
 
     url = "https://api.spotify.com/v1/me/playlists"
     playlist_data = get_spotify_data(url, access_token)
     print(playlist_data)
 
+
 if __name__== '__main__':
-    app.run()
+    if auth_code == "":
+
+        code = spotify_login()
+    access_token = establish_spotify_connection(spotify_client_id,spotify_client_secret)
+    app.run(port=8888)
     
-
-access_token = establish_spotify_connection(spotify_client_id,spotify_client_secret)
-access_token = access_token["access_token"]
-
-
-extract_track_data(spotify_search_track("Devonian: Nascent The Ocean", access_token))
-spotify_get_user_playlists(access_token)
+    
+    access_token = access_token["access_token"]
+    extract_track_data(spotify_search_track("Devonian: Nascent The Ocean", access_token))
+    spotify_get_user_playlists(access_token)
