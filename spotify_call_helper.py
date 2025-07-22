@@ -7,6 +7,7 @@ from flask import Flask, redirect
 # instance of flask application
 app = Flask(__name__)
 
+
 class Spotify_call_helper:
 
     def __init__(self, client_id, client_secret):
@@ -45,29 +46,7 @@ class Spotify_call_helper:
             self.access_token = token_data["access_token"]
             return token_data
         else:
-            ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")
-
-
-
-    def spotify_login(self):
-        """Requests an access token without use of the PKCE standard.
-        Users are Redirected to the Spotify website to login, and upon
-        a successful login, an access code is recieved."""
-        
-        scopes = "playlist-read-private playlist-modify-private playlist-modify-public"
-        state = helper.generate_random_string(16)
-        
-        redirect_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
-            "response_type": "code",
-            "client_id": self.client_id,
-            "scope": scopes,
-            "redirect_uri" : self.redirect_uri,
-            "state":state
-        })
-        
-        data = requests.get(redirect_url)
-        print(data.)
-        
+            ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")        
         
     def spotify_search_track(self, search_query):
         """Given a search query and a valid access token, returns the top 3 results,
@@ -81,7 +60,7 @@ class Spotify_call_helper:
             url += "+" + item
         
         url += "&type=track&limit=3"
-        data = self.get_spotify_data(url, self.access_token)
+        data = self.get_spotify_data(url)
         return data
 
 
@@ -107,13 +86,31 @@ class Spotify_call_helper:
     def spotify_get_user_playlists(self):
 
         url = "https://api.spotify.com/v1/me/playlists"
-        playlist_data = self.get_spotify_data(url, self.access_token)
+        playlist_data = self.get_spotify_data(url)
         print(playlist_data)
+
+@app.route('/spotify_login')
+def spotify_login(client_id, redirect_uri):
+    """Requests an access token without use of the PKCE standard.
+    Users are Redirected to the Spotify website to login, and upon
+    a successful login, an access code is recieved."""
+    
+    scopes = "playlist-read-private playlist-modify-private playlist-modify-public"
+    state = helper.generate_random_string(16)
+    
+    redirect_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
+        "response_type": "code",
+        "client_id": client_id,
+        "scope": scopes,
+        "redirect_uri" : redirect_uri,
+        "state":state
+    })
+    return redirect(redirect_url)
 
 
 if __name__== '__main__':
     bob = Spotify_call_helper("", "")
     if bob.auth_code == "":
-        code = bob.spotify_login()
+        app.run(port=8888)
     else:
         pass
