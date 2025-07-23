@@ -4,9 +4,10 @@ import urllib.parse
 import helper
 from flask import Flask, redirect
 
-# instance of flask application
-app = Flask(__name__)
+#app = Flask(__name__)
 
+client_id = "5ecb385927d94694819928aa033f888c"
+redirect_uri = "http://127.0.0.1:8888/callback"
 
 class Spotify_call_helper:
 
@@ -89,8 +90,8 @@ class Spotify_call_helper:
         playlist_data = self.get_spotify_data(url)
         print(playlist_data)
 
-@app.route('/spotify_login')
-def spotify_login(client_id, redirect_uri):
+#@app.route('/login')
+def spotify_login():
     """Requests an access token without use of the PKCE standard.
     Users are Redirected to the Spotify website to login, and upon
     a successful login, an access code is recieved."""
@@ -105,12 +106,10 @@ def spotify_login(client_id, redirect_uri):
         "redirect_uri" : redirect_uri,
         "state":state
     })
+    print(redirect_url)
     return redirect(redirect_url)
 
 
-if __name__== '__main__':
-    bob = Spotify_call_helper("", "")
-    if bob.auth_code == "":
-        app.run(port=8888)
-    else:
-        pass
+
+#bob = Spotify_call_helper("5ecb385927d94694819928aa033f888c", "58595fad58cc4dbab40a65e7b97c39ac")
+spotify_login()
