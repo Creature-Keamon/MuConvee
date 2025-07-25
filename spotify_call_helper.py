@@ -1,14 +1,5 @@
-import webbrowser
 import requests
 import base64
-import urllib.parse
-import helper
-from flask import Flask, request
-
-app = Flask(__name__)
-
-client_id = "5ecb385927d94694819928aa033f888c"
-redirect_uri = "http://127.0.0.1:8888/callback"
 
 class Spotify_call_helper:
 
@@ -86,52 +77,7 @@ class Spotify_call_helper:
 
 
     def spotify_get_user_playlists(self):
-
         url = "https://api.spotify.com/v1/me/playlists"
         playlist_data = self.get_spotify_data(url)
         print(playlist_data)
-
-@app.route('/')
-def spotify_login():
-    """Requests an access token without use of the PKCE standard.
-    Users are Redirected to the Spotify website to login"""
-    
-    scopes = "playlist-read-private playlist-modify-private playlist-modify-public"
-    state = helper.generate_random_string(16)
-    
-    redirect_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
-        "response_type": "code",
-        "client_id": client_id,
-        "scope": scopes,
-        "redirect_uri" : redirect_uri,
-        "state":state
-    })
-    webbrowser.open(redirect_url)
-    return "redirecting to Spotify login"
-
-@app.route('/callback')
-def callback():
-    """catches the callback request and extracts the auth code and 
-    state from it, assuming no errors occurred. Upon an error 
-    occurring, no attempts to retrieve the auth code or state are
-    made.
-"""
-    auth_code = request.args.get("code")
-    state = request.args.get("state")
-
-    if state == None:
-        return "An error occurred. Something has interrupted the authorisation process, you may try again."
-    else:
-        url = "Https://accounts.spotify.com/api/token"
-        form = {"code": auth_code,
-                "redirect_uri": redirect_uri,
-                "grant_type": "authorization_code"}
-        headers = {"content-type": "application/x-www-form-urlencoded",
-                   }
-
-        return "Spotify has been successfully authorised. You may now close this tab and return to MuConvee."
-
-
-#bob = Spotify_call_helper("5ecb385927d94694819928aa033f888c", "bb0aca3435b044d29df337914369606e")
-if __name__ == '__main__':
-    app.run(port=8888)
+        #TODO: finish this function
