@@ -1,19 +1,25 @@
+import threading
 import urllib.parse
 import webbrowser
 import helper
 import requests
 import base64
 from flask import Flask, request
-from spotify_call_helper import Spotify_call_helper
+import time
 
+services = {"Spotify": "Sp",
+            "Apple Music": "AP",
+            "Qobuz": "Qo"}
 
 app = Flask(__name__)
 
 client_id = ""
 client_secret = ""
-redirect_uri = "http://127.0.0.1:8888/callback"
+redirect_uri = "http://127.0.0.1:8888/spotcallback"
+running = True
+shutdown_flag = threading.Event()
 
-@app.route('/')
+@app.route('/spotlogin')
 def spotify_login():
     """Requests an access token without use of the PKCE standard.
     Users are Redirected to the Spotify website to login"""
@@ -31,7 +37,8 @@ def spotify_login():
     webbrowser.open(redirect_url)
     return "redirecting to Spotify login"
 
-@app.route('/callback')
+
+@app.route('/spotcallback')
 def callback():
     """catches the callback request and extracts the auth code and 
     state from it, assuming no errors occurred. Upon an error 
@@ -52,13 +59,47 @@ def callback():
                    "Authorization": "Basic " + base64.b64encode(f"{client_id}:{client_secret}".encode('utf-8')).decode('utf-8')}
         data = requests.post(url,form,headers=headers)
         data = data.json()
-        
-        bob = Spotify_call_helper(client_id, client_secret)
+
+        saved_data = open("credentials.muco", "w")
+        for key, value in data.items():
+            saved_data.write(f"{key}:{value}\n")
+        webbrowser.open("http://127.0.0.1:8888/shutdown")
+        return "authentication successful."
 
 
-spotify_log = input("login to spotify? y/n")
-if spotify_log.lower() == "y":
-    if __name__ == '__main__':
-        app.run(port=8888)
-else:
-   print("boohoo")
+@app.route('/shutdown', methods={'GET'})
+def shutdown():
+    """Unfreezes the main thread, but keeps the server running for reauthentication"""
+
+    global running
+    running = False
+    return "You may now close all tabs used to login to Spotify"
+
+def run_spotify():
+    app.run(port=8888)
+
+
+def start():
+    
+    run = True
+    while run:
+        login_type = input("Which service would you like to sign into now? type help to see the commands, or quit to Quit")
+        if login_type.lower() == "sp":
+            t1 = threading.Thread(target=run_spotify)
+            t1.start()
+            webbrowser.open("http://127.0.0.1:8888/spotlogin")
+            while running:
+                print("running")
+                time.sleep(1)
+        if login_type.lower() == "ap":
+            pass
+        if login_type.lower() == "qo":
+            pass
+        if login_type.lower() == "quit":
+            run = False
+        if login_type.lower() == "help":
+            for key, value in services.items():
+                print(f"{key}: {value}")
+    
+    
+    print("stopped")
