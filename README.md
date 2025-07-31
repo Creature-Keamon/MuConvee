@@ -6,7 +6,6 @@ On first release, will support playlist conversion between Apple Music, Qobuz an
 - Link Spotify API key with the rest of the API calls
 - Add Apple Music Functionality
 - Add Qobuz Functionality
-- Add Add Frontend with Tkinter
 - Link all of the Services Together
 - Possibly build it as an exe, flatpak and dmg?
 

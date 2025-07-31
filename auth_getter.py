@@ -7,14 +7,15 @@ import base64
 from flask import Flask, request
 import time
 
-services = {"Spotify": "Sp",
-            "Apple Music": "AP",
-            "Qobuz": "Qo"}
-
-app = Flask(__name__)
+services = {"Spotify": "sp",
+            "Apple Music": "ap",
+            "Qobuz": "qo"}
 
 client_id = ""
 client_secret = ""
+
+app = Flask(__name__)
+
 redirect_uri = "http://127.0.0.1:8888/spotcallback"
 running = True
 shutdown_flag = threading.Event()
@@ -60,7 +61,7 @@ def callback():
         data = requests.post(url,form,headers=headers)
         data = data.json()
 
-        saved_data = open("credentials.muco", "w")
+        saved_data = open("spotify_credentials.muco", "w")
         for key, value in data.items():
             saved_data.write(f"{key}:{value}\n")
         webbrowser.open("http://127.0.0.1:8888/shutdown")
@@ -83,14 +84,23 @@ def start():
     
     run = True
     while run:
-        login_type = input("Which service would you like to sign into now? type help to see the commands, or quit to Quit")
+        login_type = input("Which service would you like to sign into now? type help to see the commands, or quit to Quit the auth getter and return to the options screen. ")
         if login_type.lower() == "sp":
+            with open("spotify_keys.muco") as keys:
+                keys = keys.read()
+                keys = keys.splitlines()
+                global client_id
+                global client_secret
+                client_id = keys[0]
+                client_secret = keys[1]
             t1 = threading.Thread(target=run_spotify)
             t1.start()
             webbrowser.open("http://127.0.0.1:8888/spotlogin")
             while running:
                 print("running")
                 time.sleep(1)
+            
+            
         if login_type.lower() == "ap":
             pass
         if login_type.lower() == "qo":

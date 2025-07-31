@@ -24,19 +24,19 @@ def startup():
     loop = True
 
     while loop:
-        option = input("What do you want to do? type 'help' for a list of commands.")
+        option = input("What do you want to do? type 'help' for a list of commands. ")
         if option.lower() == "help":
             for key, value in commands.items():
                 print(f"{key}: {value}")
         
-        if option.lower() == "quit":
+        elif option.lower() == "quit":
             print("goodbye!")
             exit()
 
-        if option.lower() == "credits":
+        elif option.lower() == "credits":
             print("Thanks to our one contributor, Creature Keamon!")
 
-        if option.lower() == "auth":
+        elif option.lower() == "auth":
             print("starting authentication service")
             auth_getter.start()
         
