@@ -63,7 +63,7 @@ def callback():
 
         saved_data = open("spotify_credentials.muco", "w")
         for key, value in data.items():
-            saved_data.write(f"{key}:{value}\n")
+            saved_data.write(f"{value}\n")
         webbrowser.open("http://127.0.0.1:8888/shutdown")
         return "authentication successful."
 

@@ -1,3 +1,4 @@
+from secrets import token_bytes
 import requests
 import base64
 
@@ -8,7 +9,11 @@ class Spotify_call_helper:
         self.client_secret = client_secret 
         self.redirect_uri = "http://127.0.0.1:8888/callback"
         self.auth_code = ""
-        self.access_token = ""
+        with open("spotify_credentials.muco") as f:
+            f = f.read()
+            f = f.splitlines()
+        self.access_token = f[0]
+
 
     def get_spotify_data(self, url):
         """given a Spotify URL and a valid access token, requests the data at the 
@@ -22,8 +27,11 @@ class Spotify_call_helper:
         if data.status_code == 200:
             return token_data
         else:
-            ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")
-
+            error_message = token_data["error"]
+            try:
+                ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data['message']} instead.")
+            except KeyError:
+                ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {error_message["message"]} instead.")
 
     def establish_spotify_connection(self):
         """Given a client ID, client secret and API URL, a connection request to Spotify

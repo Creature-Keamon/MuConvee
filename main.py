@@ -1,10 +1,13 @@
 import auth_getter
 import time
 
+from spotify_call_helper import Spotify_call_helper
+
 commands = {"help":"displays all available commands", 
             "quit":"shuts MuConvee down", 
             "auth": "start authentication service", 
-            "credits": "displays thanks to all contributors"}
+            "credits": "displays thanks to all contributors",
+            "get <service>": "gets all playlists from the logged in account from the specified service"}
 
 
 def startup():
@@ -39,6 +42,20 @@ def startup():
         elif option.lower() == "auth":
             print("starting authentication service")
             auth_getter.start()
+        
+        elif option.lower() == "get spotify":
+            print("starting Spotify service")
+            with open("spotify_keys.muco") as keys:
+                keys = keys.read()
+                keys = keys.splitlines()
+                global client_id
+                global client_secret
+                client_id = keys[0]
+                client_secret = keys[1]
+            spotify_caller = Spotify_call_helper(client_id, client_secret)
+            print("Getting user playlists")
+            spotify_caller.spotify_get_user_playlists()
+            
         
         else:
             print("Not a valid command. Please try again.")
