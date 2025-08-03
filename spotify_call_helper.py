@@ -87,5 +87,13 @@ class Spotify_call_helper:
     def spotify_get_user_playlists(self):
         url = "https://api.spotify.com/v1/me/playlists"
         playlist_data = self.get_spotify_data(url)
-        print(playlist_data)
-        #TODO: finish this function
+        playlists = list(playlist_data["items"])
+        playlist_list = [[] for _ in playlists]
+        for playlist in range(len(playlists)):
+            current_playlist = playlists[playlist]
+            playlist_list[playlist].append({"playlist link": current_playlist["external_urls"]["spotify"]})
+            playlist_list[playlist].append({"playlist": current_playlist["name"]})
+            
+            playlist_list[playlist].append({"album link": current_playlist["album"]["external_urls"]["spotify"]})
+            playlist_list[playlist].append({"album": current_playlist["album"]["name"]})
+        print(playlist_list)
