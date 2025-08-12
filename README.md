@@ -1,6 +1,6 @@
 # MuConvee
 An (in development) locally run, open-source streaming service playlist converter.
-On first release, will support playlist conversion between Apple Music, Qobuz and Spotify.
+On first release, will support playlist conversion between Apple Music and Spotify.
 
 ### Todo for v1.0
 - Link Spotify API key with the rest of the API calls
