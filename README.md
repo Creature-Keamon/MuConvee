@@ -5,7 +5,6 @@ On first release, will support playlist conversion between Apple Music and Spoti
 ### Todo for v1.0
 - Link Spotify API key with the rest of the API calls
 - Add Apple Music Functionality
-- Add Qobuz Functionality
 - Link all of the Services Together
 - Possibly build it as an exe, flatpak and dmg?
 
