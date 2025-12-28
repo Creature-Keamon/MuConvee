@@ -1,12 +1,11 @@
-import auth_getter
+from services import auth_getter
+from services.spotify_call_helper import Spotify_call_helper
 import time
-
-from spotify_call_helper import Spotify_call_helper
+ 
 
 commands = {"help":"displays all available commands", 
             "quit":"shuts MuConvee down", 
-            "auth": "start authentication service", 
-            "credits": "displays thanks to all contributors",
+            "auth": "start authentication service",
             "get <service>": "gets all playlists from the logged in account from the specified service"}
 
 
@@ -35,9 +34,6 @@ def startup():
         elif option.lower() == "quit":
             print("goodbye!")
             exit()
-
-        elif option.lower() == "credits":
-            print("Thanks to our one contributor, Creature Keamon!")
 
         elif option.lower() == "auth":
             print("starting authentication service")

@@ -1,10 +1,11 @@
 import threading
 import urllib.parse
 import webbrowser
-import helper
+import tools.string_generator as string_generator
 import requests
 import base64
-from flask import Flask, request
+from flask import Flask
+from flask import request as flask_request
 import time
 
 services = {"Spotify": "sp",
@@ -26,7 +27,7 @@ def spotify_login():
     Users are Redirected to the Spotify website to login"""
     
     scopes = "playlist-read-private playlist-modify-private playlist-modify-public"
-    state = helper.generate_random_string(16)
+    state = string_generator.generate_random_string(16)
     
     redirect_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
         "response_type": "code",
@@ -46,8 +47,8 @@ def callback():
     occurring, no attempts to retrieve the auth code or state are
     made.
 """
-    auth_code = request.args.get("code")
-    state = request.args.get("state")
+    auth_code = flask_request.args.get("code")
+    state = flask_request.args.get("state")
 
     if state == None:
         return "An error occurred. Something has interrupted the authorisation process, you may try again."
