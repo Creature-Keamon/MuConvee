@@ -3,11 +3,12 @@ from services.spotify_call_helper import Spotify_call_helper
 import time
  
 
-commands = {"help":"displays all available commands", 
-            "quit":"shuts MuConvee down", 
+commands = {"help":"displays all available commands",
+            "quit":"shuts MuConvee down",
             "auth": "start authentication service",
             "get <service>": "gets all playlists from the logged in account from the specified service"}
-
+global client_id
+global client_secret
 
 def startup():
 
@@ -41,11 +42,9 @@ def startup():
         
         elif option.lower() == "get spotify":
             print("starting Spotify service")
-            with open("spotify_keys.muco") as keys:
+            with open("spotify_keys.muco", encoding="utf8") as keys:
                 keys = keys.read()
                 keys = keys.splitlines()
-                global client_id
-                global client_secret
                 client_id = keys[0]
                 client_secret = keys[1]
             spotify_caller = Spotify_call_helper(client_id, client_secret)

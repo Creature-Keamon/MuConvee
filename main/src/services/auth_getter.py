@@ -8,10 +8,6 @@ from flask import Flask
 from flask import request as flask_request
 import time
 
-services = {"Spotify": "sp",
-            "Apple Music": "ap",
-            "Qobuz": "qo"}
-
 client_id = ""
 client_secret = ""
 
@@ -82,35 +78,17 @@ def run_spotify():
 
 
 def start():
-    
-    run = True
-    while run:
-        login_type = input("Which service would you like to sign into now? type help to see the commands, or quit to Quit the auth getter and return to the options screen. ")
-        if login_type.lower() == "sp":
-            with open("spotify_keys.muco") as keys:
-                keys = keys.read()
-                keys = keys.splitlines()
-                global client_id
-                global client_secret
-                client_id = keys[0]
-                client_secret = keys[1]
-            t1 = threading.Thread(target=run_spotify)
-            t1.start()
-            webbrowser.open("http://127.0.0.1:8888/spotlogin")
-            while running:
-                print("running")
-                time.sleep(1)
-            
-            
-        if login_type.lower() == "ap":
-            pass
-        if login_type.lower() == "qo":
-            pass
-        if login_type.lower() == "quit":
-            run = False
-        if login_type.lower() == "help":
-            for key, value in services.items():
-                print(f"{key}: {value}")
-    
-    
-    print("stopped")
+
+    with open("spotify_keys.muco") as keys:
+        keys = keys.read()
+        keys = keys.splitlines()
+        global client_id
+        global client_secret
+        client_id = keys[0]
+        client_secret = keys[1]
+    t1 = threading.Thread(target=run_spotify)
+    t1.start()
+    webbrowser.open("http://127.0.0.1:8888/spotlogin")
+    while running:
+        print("running")
+        time.sleep(1)

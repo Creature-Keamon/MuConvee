@@ -89,6 +89,7 @@ class Spotify_call_helper:
         playlist_data = self.get_spotify_data(url)
         playlists = list(playlist_data["items"])
         playlist_list = [[] for _ in playlists]
+        print(playlists)
         for playlist in range(len(playlists)):
             current_playlist = playlists[playlist]
             playlist_list[playlist].append({"playlist link": current_playlist["external_urls"]["spotify"]})
