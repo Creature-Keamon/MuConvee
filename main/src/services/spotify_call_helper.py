@@ -15,10 +15,10 @@ class Spotify_call_helper:
         self.access_token = f[0]
 
 
-    def get_spotify_data(self, url):
-        """given a Spotify URL and a valid access token, requests the data at the 
-        link. Throws ConnectionRefusedError if the incoming status code is anything
-        other than 200."""
+    def spotify_getter_helper(self, url):
+        """Helper function. Given a Spotify URL and a valid access token, requests 
+        the data at the link. Throws ConnectionRefusedError if the incoming status
+        code is anything other than 200."""
 
         header = {"Authorization": "Bearer " + self.access_token}
         data = requests.get(url, headers=header)
@@ -61,7 +61,7 @@ class Spotify_call_helper:
             url += "+" + item
         
         url += "&type=track&limit=3"
-        data = self.get_spotify_data(url)
+        data = self.spotify_getter_helper(url)
         return data
 
 
@@ -86,7 +86,7 @@ class Spotify_call_helper:
 
     def spotify_get_user_playlists(self):
         url = "https://api.spotify.com/v1/me/playlists"
-        playlist_data = self.get_spotify_data(url)
+        playlist_data = self.spotify_getter_helper(url)
         playlists = list(playlist_data["items"])
         playlist_list = [[] for _ in playlists]
         print(playlists)
