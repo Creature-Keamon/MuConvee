@@ -1,27 +1,30 @@
-from secrets import token_bytes
-import requests
 import base64
+import requests
 
-class Spotify_call_helper:
+
+class SpotifyCallHelper:
+    """defines methods for performing operations with the Spotify API
+    """
 
     def __init__(self, client_id, client_secret):
         self.client_id = client_id 
         self.client_secret = client_secret 
         self.redirect_uri = "http://127.0.0.1:8888/callback"
         self.auth_code = ""
+        self.playlist_list = []
         with open("spotify_credentials.muco") as f:
             f = f.read()
             f = f.splitlines()
         self.access_token = f[0]
 
 
-    def spotify_getter_helper(self, url):
+    def data_requester(self, url, user_data={}):
         """Helper function. Given a Spotify URL and a valid access token, requests 
         the data at the link. Throws ConnectionRefusedError if the incoming status
         code is anything other than 200."""
 
         header = {"Authorization": "Bearer " + self.access_token}
-        data = requests.get(url, headers=header)
+        data = requests.get(url, headers = header,data = user_data)
         token_data = data.json()
 
         if data.status_code == 200:
@@ -33,7 +36,8 @@ class Spotify_call_helper:
             except KeyError:
                 raise ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {error_message["message"]} instead.")
 
-    def establish_spotify_connection(self):
+
+    def establish_connection(self):
         """Given a client ID, client secret and API URL, a connection request to Spotify
         is made, raises ConnectionRefusedError if the status code recieved is anything
         other than 200."""
@@ -48,56 +52,37 @@ class Spotify_call_helper:
             return token_data
         else:
             raise ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")        
-        
-    def spotify_search_track(self, search_query):
+       
+
+    def search_track(self, search_query):
         """Given a search query and a valid access token, returns the top 3 results,
         and all related data, of that query from Spotify's servers."""
 
         query_split = list(search_query.split(" "))
         url = "https://api.spotify.com/v1/search?q="
-        url += query_split[0]
-        
+        url += query_split[0]       
         for item in query_split[1:]:
-            url += "+" + item
-        
+            url += "+" + item      
         url += "&type=track&limit=3"
-        data = self.spotify_getter_helper(url)
+        data = self.data_requester(url)
         return data
-     
-            
-    def extract_track_data(self, data):
-        """given data about the recieved tracks, returns a list of lists with
-        the track link, track name, [artist link, artist name]+, album link and 
-        album name"""
-
-        tracks = list(data["tracks"]["items"])
-        tracklist = []
-        for track in tracks:
-            artists = {}
-            for artist_num in range(len(track["artists"])):
-                artists[
-                    "artist link " + str(artist_num)
-                    ] = track["artists"][artist_num]["external_urls"]["spotify"]
-                artists[
-                    "artist " + str(artist_num)
-                    ] = track["artists"][artist_num]["name"]
-            
-            tracklist.append({"track link": track["external_urls"]["spotify"],
-                              "track": track["name"], 
-                              "album link": track["album"]["external_urls"]["spotify"], 
-                              "album": track["album"]["name"]} + artists)
-            
-        return tracklist
 
 
+    def get_current_user_id(self):
+        "returns the id of the currently logged in user"
 
-    def spotify_get_user_playlists(self):
+        url = "https://api.spotify.com/v1/me/playlists"
+        userdata = self.data_requester(url)
+        return userdata["id"]
+
+
+    def get_user_playlists(self):
         """returns a list with the current logged in user's playlists with 
         information in a formatted dictionary like: 
         [{playlist link:string, name:string, length:integer, tracks link:string}]."""
 
         url = "https://api.spotify.com/v1/me/playlists"
-        playlist_data = self.spotify_getter_helper(url)
+        playlist_data = self.data_requester(url)
         playlists = list(playlist_data["items"])
         playlist_list = []
         for playlist in playlists:
@@ -107,3 +92,24 @@ class Spotify_call_helper:
                                    "tracks link": playlist["tracks"]["href"]})
         return playlist_list
 
+
+    def create_playlist(self, user_id, name, description):
+        """creates a Spotify playlist with the given name and description,
+        and returns the playlist's id ready for adding songs."""
+       
+        url = f"https://api.spotify.com/v1/{user_id}/playlists"
+        data = {"name":name,"description":description}
+        returned_data = self.data_requester(url, data)
+        return returned_data["id"]
+
+    def add_to_playlist(self, playlist_id, playlist_length, song, send):
+        self.playlist_list.append(song)
+        
+        if len(self.playlist_list) == 20 or send:
+            data = {"uris":[f"{item}," for item in self.playlist_list],"position":playlist_length}
+            callback = self.add_to_playlist_helper(playlist_id, data)
+
+    def add_to_playlist_helper(self, playlist_id, data):
+        url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        snapshot = self.data_requester(url, data)
+        return snapshot
