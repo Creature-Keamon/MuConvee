@@ -29,9 +29,9 @@ class Spotify_call_helper:
         else:
             error_message = token_data["error"]
             try:
-                ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data['message']} instead.")
+                raise ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data['message']} instead.")
             except KeyError:
-                ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {error_message["message"]} instead.")
+                raise ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {error_message["message"]} instead.")
 
     def establish_spotify_connection(self):
         """Given a client ID, client secret and API URL, a connection request to Spotify
@@ -47,7 +47,7 @@ class Spotify_call_helper:
             self.access_token = token_data["access_token"]
             return token_data
         else:
-            ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")        
+            raise ConnectionRefusedError(f"data not received, received code {data.status_code} with message: {token_data["message"]} instead.")        
         
     def spotify_search_track(self, search_query):
         """Given a search query and a valid access token, returns the top 3 results,
@@ -63,38 +63,47 @@ class Spotify_call_helper:
         url += "&type=track&limit=3"
         data = self.spotify_getter_helper(url)
         return data
-
-
+     
+            
     def extract_track_data(self, data):
         """given data about the recieved tracks, returns a list of lists with
         the track link, track name, [artist link, artist name]+, album link and 
         album name"""
 
         tracks = list(data["tracks"]["items"])
-        tracklist = [[] for _ in tracks]
-        for track in range(len(tracks)):
-            current_track = tracks[track]
-            tracklist[track].append({"track link": current_track["external_urls"]["spotify"]})
-            tracklist[track].append({"track": current_track["name"]})
-            for artist_num in range(len(current_track["artists"])):
-                tracklist[track].append({"artist link " + str(artist_num): current_track["artists"][artist_num]["external_urls"]["spotify"]})
-                tracklist[track].append({"artist " + str(artist_num): current_track["artists"][artist_num]["name"]})
-            tracklist[track].append({"album link": current_track["album"]["external_urls"]["spotify"]})
-            tracklist[track].append({"album": current_track["album"]["name"]})
+        tracklist = []
+        for track in tracks:
+            artists = {}
+            for artist_num in range(len(track["artists"])):
+                artists[
+                    "artist link " + str(artist_num)
+                    ] = track["artists"][artist_num]["external_urls"]["spotify"]
+                artists[
+                    "artist " + str(artist_num)
+                    ] = track["artists"][artist_num]["name"]
+            
+            tracklist.append({"track link": track["external_urls"]["spotify"],
+                              "track": track["name"], 
+                              "album link": track["album"]["external_urls"]["spotify"], 
+                              "album": track["album"]["name"]} + artists)
+            
         return tracklist
 
 
+
     def spotify_get_user_playlists(self):
+        """returns a list with the current logged in user's playlists with 
+        information in a formatted dictionary like: 
+        [{playlist link:string, name:string, length:integer, tracks link:string}]."""
+
         url = "https://api.spotify.com/v1/me/playlists"
         playlist_data = self.spotify_getter_helper(url)
         playlists = list(playlist_data["items"])
-        playlist_list = [[] for _ in playlists]
-        print(playlists)
-        for playlist in range(len(playlists)):
-            current_playlist = playlists[playlist]
-            playlist_list[playlist].append({"playlist link": current_playlist["external_urls"]["spotify"]})
-            playlist_list[playlist].append({"playlist": current_playlist["name"]})
-            
-            playlist_list[playlist].append({"album link": current_playlist["album"]["external_urls"]["spotify"]})
-            playlist_list[playlist].append({"album": current_playlist["album"]["name"]})
-        print(playlist_list)
+        playlist_list = []
+        for playlist in playlists:
+            playlist_list.append({"playlist link": playlist["external_urls"]["spotify"],
+                                   "name": playlist["name"], 
+                                   "length": playlist["tracks"]["total"],
+                                   "tracks link": playlist["tracks"]["href"]})
+        return playlist_list
+
