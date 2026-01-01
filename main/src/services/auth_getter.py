@@ -8,11 +8,11 @@ from flask import Flask
 from flask import request as flask_request
 import time
 
+STRING_LENGTH = 16
+
 client_id = ""
 client_secret = ""
-
 app = Flask(__name__)
-
 redirect_uri = "http://127.0.0.1:8888/spotcallback"
 running = True
 shutdown_flag = threading.Event()
@@ -23,7 +23,7 @@ def spotify_login():
     Users are Redirected to the Spotify website to login"""
     
     scopes = "playlist-read-private playlist-modify-private playlist-modify-public"
-    state = string_generator.generate_random_string(16)
+    state = string_generator.generate_random_string(STRING_LENGTH)
     
     redirect_url = "https://accounts.spotify.com/authorize?" + urllib.parse.urlencode({
         "response_type": "code",

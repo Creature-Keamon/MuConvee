@@ -1,6 +1,7 @@
 import base64
 import requests
 
+MAX_QUERY_LENGTH = 20
 
 class SpotifyCallHelper:
     """defines methods for performing operations with the Spotify API
@@ -92,6 +93,9 @@ class SpotifyCallHelper:
                                    "tracks link": playlist["tracks"]["href"]})
         return playlist_list
 
+    def get_playlist_items(self, playlist_id):
+        """"""
+
 
     def create_playlist(self, user_id, name, description):
         """creates a Spotify playlist with the given name and description,
@@ -102,14 +106,21 @@ class SpotifyCallHelper:
         returned_data = self.data_requester(url, data)
         return returned_data["id"]
 
+    
     def add_to_playlist(self, playlist_id, playlist_length, song, send):
-        self.playlist_list.append(song)
+        """given a song, and this function will add it to a list. Once the 
+        list becomes MAX_QUERY_LENGTH (or there are no more songs to add) 
+        add_to_playlist_helper is called to add them to the appropriate 
+        playlist.
+        """
         
-        if len(self.playlist_list) == 20 or send:
-            data = {"uris":[f"{item}," for item in self.playlist_list],"position":playlist_length}
-            callback = self.add_to_playlist_helper(playlist_id, data)
+        self.playlist_list.append(song)
+        if len(self.playlist_list) == MAX_QUERY_LENGTH or send:
+            callback = self.add_to_playlist_helper(playlist_id, playlist_length)
 
-    def add_to_playlist_helper(self, playlist_id, data):
+    
+    def add_to_playlist_helper(self, playlist_id, playlist_length):
+        data = {"uris":[f"{item}," for item in self.playlist_list],"position":playlist_length}
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
         snapshot = self.data_requester(url, data)
         return snapshot

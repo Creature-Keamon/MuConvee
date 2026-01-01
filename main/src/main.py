@@ -1,5 +1,5 @@
 from services import auth_getter
-from services.spotify_call_helper import Spotify_call_helper
+from services.spotify_call_helper import SpotifyCallHelper
 import time
  
 
@@ -34,9 +34,9 @@ def startup():
                 keys = keys.splitlines()
                 client_id = keys[0]
                 client_secret = keys[1]
-            spotify_caller = Spotify_call_helper(client_id, client_secret)
+            spotify_caller = SpotifyCallHelper(client_id, client_secret)
             print("Getting user playlists")
-            spotify_caller.spotify_get_user_playlists()
+            spotify_caller.get_user_playlists()
         else:
             print("Not a valid command. Please try again.")
 
