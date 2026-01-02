@@ -2,6 +2,7 @@ import base64
 import requests
 
 MAX_QUERY_LENGTH = 20
+YEAR_LENGTH = 4
 
 class SpotifyCallHelper:
     """defines methods for performing operations with the Spotify API
@@ -87,14 +88,39 @@ class SpotifyCallHelper:
         playlists = list(playlist_data["items"])
         playlist_list = []
         for playlist in playlists:
-            playlist_list.append({"playlist link": playlist["external_urls"]["spotify"],
+            playlist_list.append({"playlist id": playlist["id"],
                                    "name": playlist["name"], 
-                                   "length": playlist["tracks"]["total"],
-                                   "tracks link": playlist["tracks"]["href"]})
+                                   "description": playlist["description"],
+                                   "length": playlist["tracks"]["total"]})
         return playlist_list
 
+
     def get_playlist_items(self, playlist_id):
-        """"""
+        """given a playlist id, returns the entire tracklist and track information for
+        the playlist.
+        """
+        url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        playlist_content = self.data_requester(url)
+        return playlist_content
+
+
+    def get_playlist_items_helper(self, playlist_content):
+        """loops through the content of the playlist and extracts the track information and 
+        returns it in a list in the format of [Name, [Artist0,..., ArtistN], Album, Year].
+        """
+
+        tracklist = playlist_content["items"]
+        track_items = []
+        for item in tracklist:
+            current_track_info = []
+            current_track_info.append(item["name"])
+            artist_list = []
+            for artist in item["artists"]:
+                artist_list.append(artist["name"])
+            #the release date must be sliced to remove to month value of the string as Apple only provides a year release date
+            current_track_info.append(artist_list, item["album"]["name"],item["album"]["release_date"][0:YEAR_LENGTH])
+            track_items.append(current_track_info)
+        return track_items
 
 
     def create_playlist(self, user_id, name, description):
