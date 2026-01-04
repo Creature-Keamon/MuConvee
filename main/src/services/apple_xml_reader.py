@@ -27,9 +27,6 @@ def read_apple_xml_file(file):
     tracklist_xml = data[SONG_INFO_INDEX]
     playlist_info = get_playlist_info(playlist_xml)
     tracklist_info = get_playlist_songs(tracklist_xml)
-    
-    for item in tracklist_info:
-        print(item)
     return playlist_info, tracklist_info
 
 
@@ -69,5 +66,3 @@ def get_playlist_songs(tracklist_info):
                 keys.pop(0)
         song_list.append(current_song)
     return song_list
-
-read_apple_xml_file("src/main/resources/Iron Deficient.xml")
