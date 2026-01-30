@@ -1,9 +1,9 @@
 from services import auth_getter
-from services.spotify_call_helper import SpotifyCallHelper
-from services.tool_runners import open_playlist, get_service
+from services.spotify_call_helper import get_service
+from services.apple_xml_reader import open_playlist
 import time
  
-GET_PREFIX_LENGTH = 4
+PREFIX_LENGTH = 4
 
 commands = {"help":"displays all available commands",
             "quit":"shuts MuConvee down",
@@ -13,7 +13,7 @@ commands = {"help":"displays all available commands",
 global client_id
 global client_secret
 
-def startup():   
+def startup():  
     """MuConvees' 'main loop'. Calls other functions to perform all of it's actions."""
     spotify_caller = False
     loop = True
@@ -28,8 +28,8 @@ def startup():
         elif option.lower() == "auth":
             print("starting authentication service")
             auth_getter.start()
-        elif option[0:GET_PREFIX_LENGTH].lower() == "get ":
-            get_service(option[GET_PREFIX_LENGTH:])  
+        elif option[0:PREFIX_LENGTH].lower() == "get ":
+            get_service(option[PREFIX_LENGTH:])  
             spotify_caller == True
         elif option.lower() == "convert playlist":
             if spotify_caller == None:

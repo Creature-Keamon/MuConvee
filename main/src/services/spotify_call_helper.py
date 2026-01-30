@@ -14,13 +14,14 @@ class SpotifyCallHelper:
         self.redirect_uri = "http://127.0.0.1:8888/callback"
         self.auth_code = ""
         self.playlist_list = []
-        with open("spotify_credentials.muco") as f:
+        with open("spotify_credentials.muco", 'r') as f:
             f = f.read()
             f = f.splitlines()
+            f.close()
         self.access_token = f[0]
 
 
-    def data_requester(self, url, user_data={}):
+    def data_requester(self, url, user_data = None):
         """Helper function. Given a Spotify URL and a valid access token, requests 
         the data at the link. Throws ConnectionRefusedError if the incoming status
         code is anything other than 200."""
@@ -150,3 +151,17 @@ class SpotifyCallHelper:
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
         snapshot = self.data_requester(url, data)
         return snapshot
+
+def get_service(service):
+    if service == "spotify":
+        print("starting Spotify playlist getter service")
+        with open("spotify_keys.muco", encoding="utf8") as keys:
+            keys = keys.read()
+            keys = keys.splitlines()
+            client_id = keys[0]
+            client_secret = keys[1]
+        spotify_caller = SpotifyCallHelper(client_id, client_secret)
+        print("Getting user playlists")
+        spotify_caller.get_user_playlists()
+    else:
+        print("syntax error: either you typed a service that is unavailable, or a misspelling has occurred.")
