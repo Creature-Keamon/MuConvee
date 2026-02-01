@@ -17,7 +17,7 @@ def read_apple_xml_file(file):
     about the playlist of format: 
     [Name, Description]
     and the list with the songs of format:
-    [[Name, [Artist0,..., ArtistN], Album, Year]]
+    [[Name, [Artist0,..., ArtistN (max 3)], Album, Year]]
     """
 
     tree = ET.parse(file)
