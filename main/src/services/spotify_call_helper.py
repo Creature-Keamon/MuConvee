@@ -120,7 +120,7 @@ class SpotifyCallHelper:
         return returned_data["id"]
 
     
-    def add_to_playlist(self, playlist_id, playlist_length, song, send):
+    def add_to_playlist(self, playlist_id, song, send=False):
         """give a song, and this function will add it to a list. Once the 
         list becomes MAX_QUERY_LENGTH (or there are no more songs to add) 
         add_to_playlist_helper is called to add them to the appropriate 
@@ -129,11 +129,11 @@ class SpotifyCallHelper:
         
         self.playlist_list.append(song)
         if len(self.playlist_list) == MAX_QUERY_LENGTH or send:
-            callback = self.add_to_playlist_helper(playlist_id, playlist_length)
+            callback = self.add_to_playlist_helper(playlist_id)
 
     
-    def add_to_playlist_helper(self, playlist_id, playlist_length):
-        data = {"uris":[f"{item}," for item in self.playlist_list],"position":playlist_length}
+    def add_to_playlist_helper(self, playlist_id):
+        data = {"uris":[f"{item}," for item in self.playlist_list]}
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
         snapshot = self.data_requester(url, data)
         return snapshot

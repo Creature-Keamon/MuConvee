@@ -4,16 +4,16 @@ def extract_track_data(track):
     name.
     """
 
-    artists = {}
+    artists = []
     for artist_num in range(len(track["artists"])):
-        artists[
-            "artist link " + str(artist_num)
-            ] = track["artists"][artist_num]["external_urls"]["spotify"]
-        artists[
-            "artist " + str(artist_num)
-            ] = track["artists"][artist_num]["name"]       
-    track_info = {"track link": track["external_urls"]["spotify"],
-                        "name": track["name"], 
-                        "album link": track["album"]["external_urls"]["spotify"], 
-                        "album": track["album"]["name"]} + artists 
+        artists.append(
+            track["artists"][artist_num]["external_urls"]["spotify"]
+            )
+        artists.append(track["artists"][artist_num]["name"]) 
+    track_info = {"id": track["id"],
+                  "track link": track["external_urls"]["spotify"],
+                  "name": track["name"], 
+                  "album link": track["album"]["external_urls"]["spotify"], 
+                  "album": track["album"]["name"], 
+                  "artists": artists} 
     return track_info

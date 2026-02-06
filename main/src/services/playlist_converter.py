@@ -29,21 +29,29 @@ def check_playlist_creation(playlist_information, current_session, user_id):
             return spotify_playlist["playlist id"], True
     return current_session.create_playlist(user_id, apple_playlist_name, apple_playlist_description), False
 
-
 def add_to_existing_playlist(songlist, playlist_id, current_session):
     pass
 
 def add_to_new_playlist(songlist, playlist_id, current_session):
 
-
     for song in songlist:
-        # Sometimes metadata between services is inconsistent,
-        # so we only search using the song name and artist name
-        # initially to avoid the chance of a potential metadata
-        # discrepency fetching the wrong track.
-        query = song[SONG_NAME_INDEX] + '' + song[ARTISTS_INDEX][FIRST_ARTIST_INDEX]   
-        spotify_song_information = current_session.search_track(query)
-        tracklist = spotify_song_information["items"]
-        track_items = []
-        for item in tracklist:
-            track_items.append(extract_track_data(item))
+        song = get_song(song, current_session)
+        print(f"Current track: {song["name"]} by {song["artists"][1]}")
+        song_id = song["id"]
+        current_session.add_to_playlist(playlist_id, song_id)
+        
+        
+
+def get_song(song, current_session):
+    """"""
+    # Sometimes metadata between services is inconsistent,
+    # so we only search using the song name and artist name
+    # initially to avoid the chance of a potential metadata
+    # discrepency fetching the wrong track.
+    query = song[SONG_NAME_INDEX] + '' + song[ARTISTS_INDEX][FIRST_ARTIST_INDEX]   
+    spotify_song_information = current_session.search_track(query)
+    tracklist = spotify_song_information["items"]
+    track_items = []
+    for item in tracklist:
+        track_items.append(extract_track_data(item))
+    return track_items[0] #may replace with fuzzy search algorithm
