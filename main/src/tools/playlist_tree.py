@@ -1,9 +1,10 @@
 class leaf:
-    def __init__(self, previous, name, artist, album):
+    def __init__(self, previous, name, artist, album, song_id):
         self.previous = previous
         self.name = name
         self.artist = artist
         self.album = album
+        self.id = song_id
 
 class branch:
     def __init__(self, letter, leaf):
