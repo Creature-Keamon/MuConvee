@@ -1,6 +1,5 @@
 """"""
 
-
 class Leaf:
     def __init__(self, previous, name, artist, album, song_id):
         self.previous = previous

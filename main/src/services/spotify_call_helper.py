@@ -1,6 +1,6 @@
 import base64
 import requests
-from services.spotify_data_reader import extract_track_data
+from services.playlist_converter import extract_track_data
 
 MAX_QUERY_LENGTH = 20
 YEAR_LENGTH = 4
