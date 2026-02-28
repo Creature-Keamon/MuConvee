@@ -3,10 +3,10 @@
 An (in development) locally run, open-source streaming service playlist converter.
 On first release, will support playlists being converted from Apple Music to Spotify.
 
-### Todo for v1.0
-- Link Spotify API key with the rest of the API calls
-- Add Apple Music Functionality
-- Link all of the Services Together
+~~### Todo for v1.0~~
+~~- Link Spotify API key with the rest of the API calls~~
+~~- Add Apple Music Functionality~~
+~~- Link all of the Services Together~~
 
 ### Contribution
-If you wish to contribute, please get in contact with this email: Shuttk@proton.me
+~~If you wish to contribute, please get in contact with this email: Shuttk@proton.me~~
